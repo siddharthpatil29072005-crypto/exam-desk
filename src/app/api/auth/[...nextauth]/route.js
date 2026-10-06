@@ -46,12 +46,18 @@ export const authOptions = {
           throw new Error("No account found with this email.");
         }
 
-        if (credentials.role === "admin" && user.role !== "admin") {
-          throw new Error("Access denied: You are using a Standard User account.");
+        if (credentials.role === "admin") {
+          if (user.role !== "admin") {
+            throw new Error("Access denied: You are using a Standard User account.");
+          }
+          const SECRET_PIN = process.env.ADMIN_PIN || "1234";
+          if (credentials.adminPin !== SECRET_PIN) {
+            throw new Error("Invalid Admin Access PIN.");
+          }
         }
         
         if (credentials.role === "user" && user.role === "admin") {
-          throw new Error("Admins must use the Admin Login portal.");
+          throw new Error("Admins must use the hidden Admin Login portal.");
         }
 
         const isPasswordMatch = await bcrypt.compare(credentials.password, user.password);

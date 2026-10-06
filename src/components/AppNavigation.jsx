@@ -12,7 +12,6 @@ const links = [
   { href: "/full-tests", label: "Full tests", icon: BookOpenCheck },
   { href: "/notes", label: "Notes", icon: BookOpenCheck },
   { href: "/dashboard", label: "My results", icon: LayoutDashboard },
-  { href: "/admin", label: "Admin", icon: Shield },
 ];
 
 export default function AppNavigation() {
@@ -20,6 +19,8 @@ export default function AppNavigation() {
   const router = useRouter();
   const { user } = useAuth();
   const notify = useToast();
+
+  const isAdmin = user?.role === "admin";
 
   async function handleSignOut() {
     try {
@@ -57,6 +58,20 @@ export default function AppNavigation() {
               </Link>
             );
           })}
+
+          {isAdmin && (
+            <Link
+              aria-current={pathname.startsWith("/admin") ? "page" : undefined}
+              className={`flex min-h-10 items-center gap-2 px-3 text-sm font-medium transition-colors ${
+                pathname.startsWith("/admin") ? "bg-slate-100 text-blue-800" : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
+              }`}
+              href="/admin"
+            >
+              <Shield aria-hidden="true" className="h-4 w-4" />
+              <span className="hidden sm:inline">Admin</span>
+            </Link>
+          )}
+
           {user ? (
             <button
               aria-label="Sign out"

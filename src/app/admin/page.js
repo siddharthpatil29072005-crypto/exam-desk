@@ -3,6 +3,7 @@
 import { BookOpenCheck, CircleAlert, Plus, ShieldCheck, Trash2 } from "lucide-react";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import LoadingState from "@/components/LoadingState";
 import SetupNotice from "@/components/SetupNotice";
@@ -35,7 +36,8 @@ function makeQuestion(defaultMarks = "1", defaultNegative = "0") {
 }
 
 export default function AdminPage() {
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user, loading } = useAuth();
   const [isAdminClaim, setIsAdminClaim] = useState(false);
   const exams = useCollection("exams");
   const subjects = useCollection("subjects");
@@ -63,13 +65,12 @@ export default function AdminPage() {
   const [questions, setQuestions] = useState(() => [makeQuestion()]);
 
   useEffect(() => {
-    if (!user) {
-      setIsAdminClaim(false);
+    if (!loading && (!user || user.role !== "admin")) {
+      router.push("/admin-login");
       return;
     }
-    // Strictly check NextAuth role to match backend
-    setIsAdminClaim(user.role === "admin");
-  }, [user]);
+    setIsAdminClaim(user?.role === "admin");
+  }, [user, loading, router]);
 
   function unlockAdmin(event) {
     event.preventDefault();
