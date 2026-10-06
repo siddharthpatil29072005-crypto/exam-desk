@@ -356,9 +356,9 @@ export default function AdminPage() {
               <p className="mt-0.5 text-xs opacity-90">
                 {user
                   ? isAdminClaim
-                    ? "Your account is authorized to create, edit, and delete exams, subjects, topics, and tests in Firestore."
-                    : "Firestore security rules block database writes without the admin claim. If adding records fails with 'permission denied', grant the claim or update rules in Firebase Console."
-                  : "Firestore security rules reject all database writes for guests. Please log in before adding subjects, exams, or tests."}
+                    ? "Your account is authorized to create, edit, and delete exams, subjects, topics, and tests in the database."
+                    : "Database security rules block writes without the admin role. Please log in with the admin account."
+                  : "Database security rules reject all writes for guests. Please log in before adding subjects, exams, or tests."}
               </p>
             </div>
           </div>
@@ -371,7 +371,7 @@ export default function AdminPage() {
             </Link>
           ) : !isAdminClaim ? (
             <span className="shrink-0 rounded bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-900 border border-amber-300">
-              Admin claim needed
+              Admin role needed
             </span>
           ) : (
             <span className="shrink-0 rounded bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-900 border border-emerald-300">
