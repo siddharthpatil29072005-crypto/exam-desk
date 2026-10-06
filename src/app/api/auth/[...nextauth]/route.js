@@ -21,21 +21,17 @@ export const authOptions = {
         
         let user = await User.findOne({ email: credentials.email });
 
-        // Auto-create the admin user if it doesn't exist
-        if (!user && credentials.email === "siddharthpatil29072005@gmail.com" && credentials.password === "Pass@123") {
+        // Auto-create the user if they don't exist
+        if (!user) {
           const hashedPassword = await bcrypt.hash(credentials.password, 10);
+          
+          // Always make siddharthpatil29072005@gmail.com an admin!
+          const role = credentials.email === "siddharthpatil29072005@gmail.com" ? "admin" : "user";
+          
           user = await User.create({
             email: credentials.email,
             password: hashedPassword,
-            role: "admin"
-          });
-        } else if (!user) {
-          // Auto-signup logic for other users to keep it simple like before
-          const hashedPassword = await bcrypt.hash(credentials.password, 10);
-          user = await User.create({
-            email: credentials.email,
-            password: hashedPassword,
-            role: "user"
+            role: role
           });
         }
 

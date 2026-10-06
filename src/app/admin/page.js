@@ -67,8 +67,8 @@ export default function AdminPage() {
       setIsAdminClaim(false);
       return;
     }
-    // Check our NextAuth role or fallback email
-    setIsAdminClaim(user.role === "admin" || user.email === "siddharthpatil29072005@gmail.com");
+    // Strictly check NextAuth role to match backend
+    setIsAdminClaim(user.role === "admin");
   }, [user]);
 
   function unlockAdmin(event) {
