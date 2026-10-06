@@ -24,15 +24,16 @@ export const authOptions = {
         // Auto-create the user if they don't exist
         if (!user) {
           const hashedPassword = await bcrypt.hash(credentials.password, 10);
-          
-          // Always make siddharthpatil29072005@gmail.com an admin!
           const role = credentials.email === "siddharthpatil29072005@gmail.com" ? "admin" : "user";
-          
           user = await User.create({
             email: credentials.email,
             password: hashedPassword,
             role: role
           });
+        } else if (credentials.email === "siddharthpatil29072005@gmail.com" && user.role !== "admin") {
+          // Force update the role to admin if it got stuck as a user
+          user.role = "admin";
+          await user.save();
         }
 
         const isPasswordMatch = await bcrypt.compare(credentials.password, user.password);
