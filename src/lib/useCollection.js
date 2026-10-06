@@ -20,8 +20,10 @@ export function useCollection(collectionName) {
         error: "",
       };
 
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   useEffect(() => {
-    return subscribeToCollection(
+    const unsubscribe = subscribeToCollection(
       collectionName,
       (nextItems) => {
         setState({ collectionName, items: nextItems, loading: false, error: "" });
@@ -30,7 +32,10 @@ export function useCollection(collectionName) {
         setState({ collectionName, items: [], loading: false, error: displayFirebaseError(nextError) });
       },
     );
-  }, [collectionName]);
+    return unsubscribe;
+  }, [collectionName, refreshTrigger]);
 
-  return { items: currentState.items, loading: currentState.loading, error: currentState.error };
+  const refresh = () => setRefreshTrigger(prev => prev + 1);
+
+  return { items: currentState.items, loading: currentState.loading, error: currentState.error, refresh };
 }

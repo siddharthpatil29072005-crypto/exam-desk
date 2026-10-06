@@ -4,7 +4,6 @@ export const FIREBASE_SETUP_MESSAGE = "Using MongoDB Atlas via Server Actions.";
 
 export function subscribeToCollection(collectionName, onData, onError) {
   let isSubscribed = true;
-  let interval;
 
   const fetchItems = async () => {
     try {
@@ -21,13 +20,15 @@ export function subscribeToCollection(collectionName, onData, onError) {
 
   fetchItems();
 
-  // Poll every 3 seconds to mimic realtime updates without overloading MongoDB
-  interval = setInterval(fetchItems, 3000);
-
-  return () => {
+  // Remove the aggressive 3-second interval that was overloading Vercel
+  // We will rely on manual refreshes or long polling if needed, but for now just fetch once
+  // To keep the signature the same, we return an unsubscribe function and a forceRefresh function
+  const unsubscribe = () => {
     isSubscribed = false;
-    clearInterval(interval);
   };
+  
+  unsubscribe.forceRefresh = fetchItems;
+  return unsubscribe;
 }
 
 export async function getCollection(collectionName) {
@@ -57,7 +58,6 @@ export function displayFirebaseError(error) {
 
 export function subscribeToUserResults(userId, onData, onError) {
   let isSubscribed = true;
-  let interval;
 
   const fetchItems = async () => {
     try {
@@ -73,10 +73,11 @@ export function subscribeToUserResults(userId, onData, onError) {
   };
 
   fetchItems();
-  interval = setInterval(fetchItems, 3000);
 
-  return () => {
+  const unsubscribe = () => {
     isSubscribed = false;
-    clearInterval(interval);
   };
+  
+  unsubscribe.forceRefresh = fetchItems;
+  return unsubscribe;
 }

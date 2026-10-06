@@ -112,6 +112,11 @@ export default function AdminPage() {
     try {
       await createRecord(collectionName, { ...values, name: trimmedName });
       setName("");
+      
+      if (collectionName === "exams") exams.refresh();
+      if (collectionName === "subjects") subjects.refresh();
+      if (collectionName === "topics") topics.refresh();
+      
       notify(`${trimmedName} added successfully.`, "success");
     } catch (error) {
       if (error?.code === "permission-denied") {
@@ -132,6 +137,11 @@ export default function AdminPage() {
 
     try {
       await deleteRecord(collectionName, record.id);
+      
+      if (collectionName === "exams") exams.refresh();
+      if (collectionName === "subjects") subjects.refresh();
+      if (collectionName === "topics") topics.refresh();
+      
       notify(`${record.name} deleted.`, "success");
     } catch (error) {
       notify(displayFirebaseError(error), "error");
@@ -224,6 +234,8 @@ export default function AdminPage() {
         correctOptionIndices: questions.map((question) => Number(question.correctOptionIndex)),
       });
       
+      tests.refresh();
+      
       setTestTitle("");
       setDurationMinutes("30");
       setTimePerQuestionSeconds("0");
@@ -258,6 +270,9 @@ export default function AdminPage() {
         subjectId,
         topicId: topicId || "",
       });
+      
+      notes.refresh();
+      
       setNoteTitle("");
       setNoteContent("");
       notify("Note saved to the library.", "success");
