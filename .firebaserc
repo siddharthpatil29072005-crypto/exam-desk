@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "mock-test-a40aa"
+  },
+  "targets": {
+    "mock-test-a40aa": {
+      "hosting": {
+        "competetiveexamprep": [
+          "competetiveexamprep"
+        ]
+      }
+    }
+  }
+}

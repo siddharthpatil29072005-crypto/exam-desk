@@ -1,0 +1,44 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    match /exams/{examId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /subjects/{subjectId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /topics/{topicId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /tests/{testId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /answerKeys/{testId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /results/{resultId} {
+      allow get, list: if isSignedIn()
+        && resource.data.userId == request.auth.uid;
+      allow create: if false;
+      allow update, delete: if false;
+    }
+  }
+}
