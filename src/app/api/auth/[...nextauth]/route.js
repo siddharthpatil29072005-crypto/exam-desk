@@ -19,26 +19,44 @@ export const authOptions = {
 
         await connectToDatabase();
         
-        let user = await User.findOne({ email: credentials.email });
+        let user = await User.findOne({ email: credentials.email.toLowerCase() });
 
-        // Auto-create the user if they don't exist
-        if (!user) {
+        if (credentials.mode === "signup") {
+          if (user) throw new Error("An account with this email already exists.");
+
+          if (credentials.role === "admin") {
+            const SECRET_PIN = process.env.ADMIN_PIN || "1234";
+            if (credentials.adminPin !== SECRET_PIN) {
+              throw new Error("Invalid Admin Access PIN.");
+            }
+          }
+
           const hashedPassword = await bcrypt.hash(credentials.password, 10);
-          const role = credentials.email === "siddharthpatil29072005@gmail.com" ? "admin" : "user";
           user = await User.create({
-            email: credentials.email,
+            email: credentials.email.toLowerCase(),
             password: hashedPassword,
-            role: role
+            role: credentials.role === "admin" ? "admin" : "user"
           });
-        } else if (credentials.email === "siddharthpatil29072005@gmail.com" && user.role !== "admin") {
-          // Force update the role to admin if it got stuck as a user
-          user.role = "admin";
-          await user.save();
+
+          return { id: user._id.toString(), email: user.email, role: user.role };
+        }
+
+        // Login Mode
+        if (!user) {
+          throw new Error("No account found with this email.");
+        }
+
+        if (credentials.role === "admin" && user.role !== "admin") {
+          throw new Error("Access denied: You are using a Standard User account.");
+        }
+        
+        if (credentials.role === "user" && user.role === "admin") {
+          throw new Error("Admins must use the Admin Login portal.");
         }
 
         const isPasswordMatch = await bcrypt.compare(credentials.password, user.password);
         if (!isPasswordMatch) {
-          throw new Error("Invalid password");
+          throw new Error("Incorrect password.");
         }
 
         return { id: user._id.toString(), email: user.email, role: user.role };
