@@ -11,7 +11,7 @@ import SetupNotice from "@/components/SetupNotice";
 import Timer from "@/components/Timer";
 import { useAuth } from "@/lib/auth-context";
 import { logAnalyticsEvent } from "@/lib/firebase";
-import { displayFirebaseError } from "@/lib/firestore";
+import { displayFirebaseError, getCollection, createRecord } from "@/lib/firestore";
 import { useCollection } from "@/lib/useCollection";
 import { useToast } from "@/components/ToastProvider";
 
@@ -45,11 +45,10 @@ function TestRunner() {
     setSaving(true);
 
     try {
-      const data = localStorage.getItem("mock_db");
-      const db = data ? JSON.parse(data) : {};
+      const answerKeys = await getCollection("answerKeys");
       
-      const answerKeyRecord = db["answerKeys"]?.find((ak) => ak.id === test.id);
-      if (!answerKeyRecord) throw new Error("Answer key not found for this test.");
+      const answerKeyRecord = answerKeys.find((ak) => ak.id === test.id);
+      if (!answerKeyRecord) throw new Error("Answer key not found for this test. The admin may have deleted it.");
       
       const correctOptionIndices = answerKeyRecord.correctOptionIndices;
       
@@ -81,7 +80,7 @@ function TestRunner() {
 
       const percentage = totalMaxMarks > 0 ? (score / totalMaxMarks) * 100 : 0;
       
-      const result = {
+      const resultData = {
         testId: test.id,
         testTitle: test.title,
         userId: user?.uid || null,
@@ -93,13 +92,11 @@ function TestRunner() {
       };
       
       if (user) {
-        if (!db["results"]) db["results"] = [];
-        db["results"].push({ id: Math.random().toString(36).substring(2, 15), ...result });
-        localStorage.setItem("mock_db", JSON.stringify(db));
+        await createRecord("results", resultData);
         notify("Your result has been saved to your account.", "success");
       }
       
-      setResult(result);
+      setResult(resultData);
     } catch (submitError) {
       notify(submitError.message || "Something went wrong.", "error");
       submitting.current = false;
