@@ -10,6 +10,7 @@ import { useCollection } from "@/lib/useCollection";
 export default function FullTestsPage() {
   const exams = useCollection("exams");
   const tests = useCollection("tests");
+  const { items: myResults } = useCollection("results");
   const [examId, setExamId] = useState("");
 
   const filteredTests = useMemo(() => tests.items.filter((test) => {
@@ -68,23 +69,55 @@ export default function FullTestsPage() {
           </div>
         ) : (
           <div className="divide-y divide-slate-200 border-t border-slate-200">
-            {filteredTests.map((test) => {
+                        {filteredTests.map((test) => {
               const exam = exams.items.find((item) => item.id === test.examId);
+              const isCompleted = myResults.some((r) => r.testId === test.id);
+              const now = new Date();
+              const isUpcoming = test.startTime && new Date(test.startTime) > now;
+              const isExpired = test.endTime && new Date(test.endTime) < now;
+              const isLive = !isUpcoming && !isExpired;
+
               return (
                 <article className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center sm:justify-between" key={test.id}>
                   <div className="min-w-0">
-                    <p className="text-xs font-medium text-slate-500">{exam?.name || "Exam"}</p>
+                    <p className="text-xs font-medium text-slate-500">
+                      {exam?.name || "Exam"}
+                      {isUpcoming && <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-amber-800">Upcoming</span>}
+                      {isExpired && !isCompleted && <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 text-red-800">Expired</span>}
+                      {isLive && !isCompleted && <span className="ml-2 rounded bg-emerald-100 px-1.5 py-0.5 text-emerald-800">Live</span>}
+                      {isCompleted && <span className="ml-2 rounded bg-blue-100 px-1.5 py-0.5 text-blue-800">Completed</span>}
+                    </p>
                     <h3 className="mt-1 wrap-break-word text-lg font-semibold text-slate-950">{test.title}</h3>
                     <p className="mt-1 text-sm text-slate-600">
-                      {test.questions?.length || 0} questions Â· {test.durationMinutes || "No"} min Â· +{test.marksPerQuestion || 1} / -{test.negativeMarkingPerWrongAnswer || 0} per wrong attempt
+                      {test.questions?.length || 0} questions • {test.durationMinutes || "No"} min • +{test.marksPerQuestion || 1} / -{test.negativeMarkingPerWrongAnswer || 0} per wrong attempt
                     </p>
+                    {test.startTime && <p className="mt-1 text-xs text-slate-500">Available from: {new Date(test.startTime).toLocaleString()}</p>}
+                    {test.endTime && <p className="mt-1 text-xs text-slate-500">Ends at: {new Date(test.endTime).toLocaleString()}</p>}
                   </div>
-                  <Link
-                    className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 bg-blue-700 px-4 text-sm font-semibold text-white hover:bg-blue-800"
-                    href={`/test/?id=${encodeURIComponent(test.id)}`}
-                  >
-                    Start test <ArrowRight aria-hidden="true" className="h-4 w-4" />
-                  </Link>
+                  
+                  {isCompleted ? (
+                    <Link
+                      className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-800"
+                      href={/test/?id= + encodeURIComponent(test.id)}
+                    >
+                      View Result <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                    </Link>
+                  ) : isUpcoming ? (
+                    <button disabled className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 bg-slate-200 px-4 text-sm font-semibold text-slate-500 cursor-not-allowed">
+                      Starts Later
+                    </button>
+                  ) : isExpired ? (
+                    <button disabled className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 bg-red-100 px-4 text-sm font-semibold text-red-700 cursor-not-allowed">
+                      Missed
+                    </button>
+                  ) : (
+                    <Link
+                      className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 bg-blue-700 px-4 text-sm font-semibold text-white hover:bg-blue-800"
+                      href={/test/?id= + encodeURIComponent(test.id)}
+                    >
+                      Start test <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                    </Link>
+                  )}
                 </article>
               );
             })}
@@ -94,3 +127,4 @@ export default function FullTestsPage() {
     </main>
   );
 }
+

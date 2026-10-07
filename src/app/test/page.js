@@ -12,6 +12,7 @@ import Timer from "@/components/Timer";
 import { useAuth } from "@/lib/auth-context";
 import { logAnalyticsEvent } from "@/lib/firebase";
 import { displayFirebaseError, getCollection, createRecord } from "@/lib/firestore";
+import { getTestSubmissionStatusAction } from "@/app/actions/db-actions";
 import { useCollection } from "@/lib/useCollection";
 import { useToast } from "@/components/ToastProvider";
 
@@ -38,6 +39,41 @@ function TestRunner() {
   const test = tests.find((item) => item.id === id);
   const questions = test?.questions || [];
   const question = questions[currentIndex];
+
+  const [checkingPastSubmission, setCheckingPastSubmission] = useState(true);
+
+  useEffect(() => {
+    if (!id || !user || !test) {
+      if (test) setCheckingPastSubmission(false);
+      return;
+    }
+
+    async function checkStatus() {
+      try {
+        const status = await getTestSubmissionStatusAction(id);
+        if (status.success && status.hasSubmitted) {
+          const uiResult = {
+            ...status.resultData,
+            answerReview: test.questions.map((q, index) => {
+              const detail = status.resultData.details.find(d => d.questionId === q.id);
+              return {
+                ...q,
+                selectedOptionIndex: detail ? detail.selectedOptionIndex : null,
+                correctOptionIndex: status.correctOptionIndices[index]
+              };
+            })
+          };
+          setResult(uiResult);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setCheckingPastSubmission(false);
+      }
+    }
+    
+    checkStatus();
+  }, [id, user, test]);
 
   async function submitTest() {
     if (submitting.current || !test || questions.length === 0) return;
@@ -79,14 +115,17 @@ function TestRunner() {
       });
 
       const percentage = totalMaxMarks > 0 ? (score / totalMaxMarks) * 100 : 0;
+      const correctAnswers = details.filter((d) => d.isCorrect).length;
       
       const resultData = {
         testId: test.id,
         testTitle: test.title,
         userId: user?.uid || null,
         score,
-        totalMaxMarks,
-        percentage,
+        totalMarks: totalMaxMarks,
+        totalQuestions: questions.length,
+        correctAnswers,
+        percentage: Math.round(percentage),
         details,
         submittedAt: new Date().toISOString()
       };
@@ -123,7 +162,7 @@ function TestRunner() {
     notify("Time for this question is up.", "info");
   }
 
-  if (loading) return <LoadingState label="Loading test" />;
+  if (loading || checkingPastSubmission) return <LoadingState label="Loading test" />;
   if (error) return <main className="mx-auto max-w-3xl px-4 py-10"><SetupNotice /></main>;
   if (!test) {
     return (
@@ -138,6 +177,31 @@ function TestRunner() {
   }
   if (questions.length === 0) {
     return <main className="mx-auto max-w-3xl px-4 py-12"><div className="flex gap-3 border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950"><CircleAlert className="h-5 w-5 shrink-0" />This test does not contain any questions.</div></main>;
+  }
+
+  const now = new Date();
+  if (test.startTime && new Date(test.startTime) > now && !result) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-12 text-center">
+        <h1 className="text-2xl font-semibold text-slate-950">Test not started</h1>
+        <p className="mt-2 text-sm text-slate-600">This test will be available starting at {new Date(test.startTime).toLocaleString()}.</p>
+        <Link className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-blue-800" href="/">
+          <ArrowLeft aria-hidden="true" className="h-4 w-4" /> Back to tests
+        </Link>
+      </main>
+    );
+  }
+  
+  if (test.endTime && new Date(test.endTime) < now && !result) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-12 text-center">
+        <h1 className="text-2xl font-semibold text-slate-950">Test expired</h1>
+        <p className="mt-2 text-sm text-slate-600">The time window for this test ended at {new Date(test.endTime).toLocaleString()}.</p>
+        <Link className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-blue-800" href="/">
+          <ArrowLeft aria-hidden="true" className="h-4 w-4" /> Back to tests
+        </Link>
+      </main>
+    );
   }
 
   if (result) {

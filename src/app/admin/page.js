@@ -55,6 +55,8 @@ export default function AdminPage() {
   const [subjectId, setSubjectId] = useState("");
   const [topicId, setTopicId] = useState("");
   const [testTitle, setTestTitle] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [durationMinutes, setDurationMinutes] = useState("30");
   const [timePerQuestionSeconds, setTimePerQuestionSeconds] = useState("0");
   const [marksPerQuestion, setMarksPerQuestion] = useState("1");
@@ -207,6 +209,8 @@ export default function AdminPage() {
         timePerQuestionSeconds: Number(timePerQuestionSeconds) || 0,
         marksPerQuestion: parsedDefaultMarks,
         negativeMarkingPerWrongAnswer: parsedDefaultNegative,
+        startTime: startTime || null,
+        endTime: endTime || null,
         questions: questions.map((question, index) => {
           const qMarks = Number(
             question.marks !== undefined && question.marks !== ""
@@ -237,6 +241,8 @@ export default function AdminPage() {
       tests.refresh();
       
       setTestTitle("");
+      setStartTime("");
+      setEndTime("");
       setDurationMinutes("30");
       setTimePerQuestionSeconds("0");
       setQuestions([makeQuestion(marksPerQuestion, negativeMarkingPerWrongAnswer)]);
@@ -574,6 +580,10 @@ export default function AdminPage() {
               activeTopics={activeTopics}
               applyDefaultsToAllQuestions={applyDefaultsToAllQuestions}
               durationMinutes={durationMinutes}
+              startTime={startTime}
+              setStartTime={setStartTime}
+              endTime={endTime}
+              setEndTime={setEndTime}
               examId={examId}
               exams={exams}
               filteredTests={practiceTests}
@@ -612,6 +622,10 @@ export default function AdminPage() {
               activeTopics={activeTopics}
               applyDefaultsToAllQuestions={applyDefaultsToAllQuestions}
               durationMinutes={durationMinutes}
+              startTime={startTime}
+              setStartTime={setStartTime}
+              endTime={endTime}
+              setEndTime={setEndTime}
               examId={examId}
               exams={exams}
               filteredTests={fullTests}
@@ -704,6 +718,10 @@ function TestBuilderPanel({
   setSubjectId,
   topicId,
   setTopicId,
+  startTime,
+  setStartTime,
+  endTime,
+  setEndTime,
   durationMinutes,
   setDurationMinutes,
   timePerQuestionSeconds,
@@ -819,6 +837,14 @@ function TestBuilderPanel({
           <label className="grid gap-1.5 text-sm font-medium text-slate-700">
             Test duration (minutes)
             <input className="h-11 border border-slate-300 bg-white px-3 text-slate-950" min="0" onChange={(event) => setDurationMinutes(event.target.value)} type="number" value={durationMinutes} />
+          </label>
+          <label className="grid gap-1.5 text-sm font-medium text-slate-700">
+            Start Time (Optional)
+            <input className="h-11 border border-slate-300 bg-white px-3 text-slate-950" type="datetime-local" onChange={(event) => setStartTime(event.target.value)} value={startTime || ""} />
+          </label>
+          <label className="grid gap-1.5 text-sm font-medium text-slate-700">
+            End Time (Optional)
+            <input className="h-11 border border-slate-300 bg-white px-3 text-slate-950" type="datetime-local" onChange={(event) => setEndTime(event.target.value)} value={endTime || ""} />
           </label>
           <label className="grid gap-1.5 text-sm font-medium text-slate-700">
             Per-question timer (seconds, optional)

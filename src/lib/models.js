@@ -53,6 +53,8 @@ const TestSchema = new mongoose.Schema({
   timePerQuestionSeconds: { type: Number, default: 0 },
   marksPerQuestion: { type: Number, default: 1 },
   negativeMarkingPerWrongAnswer: { type: Number, default: 0 },
+  startTime: { type: String }, // ISO String
+  endTime: { type: String }, // ISO String
   questions: [QuestionSchema],
   createdAt: { type: Date, default: Date.now }
 });

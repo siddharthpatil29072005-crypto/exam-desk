@@ -26,15 +26,54 @@ async function requireAdmin() {
 
 export async function fetchCollectionAction(collectionName) {
   try {
+    if (collectionName === "answerKeys") {
+      await requireAdmin();
+    }
+
     const Model = modelsMap[collectionName];
     if (!Model) throw new Error("Invalid collection name: " + collectionName);
     
     await connectToDatabase();
     
-    const data = await Model.find({}).lean();
+    // For results, if not admin, only return the user's own results
+    let filter = {};
+    if (collectionName === "results") {
+      const session = await getServerSession(authOptions);
+      if (!session || !session.user) return { success: true, data: [] };
+      if (session.user.role !== "admin") {
+        filter = { userId: session.user.id || session.user.email };
+      }
+    }
+
+    const data = await Model.find(filter).lean();
     return { success: true, data: JSON.parse(JSON.stringify(data)) };
   } catch (error) {
     console.error("fetchCollectionAction error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getTestSubmissionStatusAction(testId) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) return { success: true, hasSubmitted: false };
+
+    await connectToDatabase();
+    const userId = session.user.id || session.user.email;
+    
+    const result = await Result.findOne({ testId, userId }).lean();
+    if (!result) return { success: true, hasSubmitted: false };
+
+    const answerKey = await AnswerKey.findOne({ id: testId }).lean();
+    
+    return { 
+      success: true, 
+      hasSubmitted: true, 
+      resultData: JSON.parse(JSON.stringify(result)),
+      correctOptionIndices: answerKey ? answerKey.correctOptionIndices : []
+    };
+  } catch (error) {
+    console.error("getTestSubmissionStatusAction error:", error);
     return { success: false, error: error.message };
   }
 }
