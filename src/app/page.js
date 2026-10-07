@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { ArrowRight, FileQuestion, Search } from "lucide-react";
 import Link from "next/link";
@@ -43,7 +43,7 @@ export default function HomePage() {
     <main className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
       <section className="grid gap-8 border-b border-slate-200 pb-10 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-800">Exam Desk · Practice</p>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-800">Exam Desk Â· Practice</p>
           <h1 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight text-slate-950 sm:text-4xl">
             Prepare with purpose.
           </h1>
@@ -115,7 +115,7 @@ export default function HomePage() {
                 <article className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center sm:justify-between" key={test.id}>
                   <div className="min-w-0">
                     <p className="text-xs font-medium text-slate-500">
-                      {[exam?.name, subject?.name, topic?.name].filter(Boolean).join(" � ")}
+                      {[exam?.name, subject?.name, topic?.name].filter(Boolean).join(" • ")}
                       {isUpcoming && <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-amber-800">Upcoming</span>}
                       {isExpired && !isCompleted && <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 text-red-800">Expired</span>}
                       {isLive && !isCompleted && <span className="ml-2 rounded bg-emerald-100 px-1.5 py-0.5 text-emerald-800">Live</span>}
@@ -123,7 +123,7 @@ export default function HomePage() {
                     </p>
                     <h3 className="mt-1 wrap-break-word text-lg font-semibold text-slate-950">{test.title}</h3>
                     <p className="mt-1 text-sm text-slate-600">
-                      {test.questions?.length || 0} questions � {test.durationMinutes || "No"} min � +{test.marksPerQuestion || 1} / -{test.negativeMarkingPerWrongAnswer || 0} per wrong attempt
+                      {test.questions?.length || 0} questions • {test.durationMinutes || "No"} min • +{test.marksPerQuestion || 1} / -{test.negativeMarkingPerWrongAnswer || 0} per wrong attempt
                     </p>
                     {test.startTime && <p className="mt-1 text-xs text-slate-500">Available from: {new Date(test.startTime).toLocaleString()}</p>}
                     {test.endTime && <p className="mt-1 text-xs text-slate-500">Ends at: {new Date(test.endTime).toLocaleString()}</p>}

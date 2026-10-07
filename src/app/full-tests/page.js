@@ -1,4 +1,4 @@
-"use client";
+ï»¿"use client";
 
 import { ArrowRight, FileText } from "lucide-react";
 import Link from "next/link";
@@ -89,7 +89,7 @@ export default function FullTestsPage() {
                     </p>
                     <h3 className="mt-1 wrap-break-word text-lg font-semibold text-slate-950">{test.title}</h3>
                     <p className="mt-1 text-sm text-slate-600">
-                      {test.questions?.length || 0} questions • {test.durationMinutes || "No"} min • +{test.marksPerQuestion || 1} / -{test.negativeMarkingPerWrongAnswer || 0} per wrong attempt
+                      {test.questions?.length || 0} questions â€¢ {test.durationMinutes || "No"} min â€¢ +{test.marksPerQuestion || 1} / -{test.negativeMarkingPerWrongAnswer || 0} per wrong attempt
                     </p>
                     {test.startTime && <p className="mt-1 text-xs text-slate-500">Available from: {new Date(test.startTime).toLocaleString()}</p>}
                     {test.endTime && <p className="mt-1 text-xs text-slate-500">Ends at: {new Date(test.endTime).toLocaleString()}</p>}

@@ -70,7 +70,9 @@ const ResultSchema = new mongoose.Schema({
   testTitle: String,
   userId: String,
   score: Number,
-  totalMaxMarks: Number,
+  totalMarks: Number,
+  totalQuestions: Number,
+  correctAnswers: Number,
   percentage: Number,
   details: mongoose.Schema.Types.Mixed,
   submittedAt: { type: Date, default: Date.now }
