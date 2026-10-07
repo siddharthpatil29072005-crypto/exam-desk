@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { ArrowRight, FileText } from "lucide-react";
 import Link from "next/link";
@@ -98,7 +98,7 @@ export default function FullTestsPage() {
                   {isCompleted ? (
                     <Link
                       className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-800"
-                      href={/test/?id= + encodeURIComponent(test.id)}
+                      href={`/test/?id=${encodeURIComponent(test.id)}`}
                     >
                       View Result <ArrowRight aria-hidden="true" className="h-4 w-4" />
                     </Link>
@@ -113,7 +113,7 @@ export default function FullTestsPage() {
                   ) : (
                     <Link
                       className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 bg-blue-700 px-4 text-sm font-semibold text-white hover:bg-blue-800"
-                      href={/test/?id= + encodeURIComponent(test.id)}
+                      href={`/test/?id=${encodeURIComponent(test.id)}`}
                     >
                       Start test <ArrowRight aria-hidden="true" className="h-4 w-4" />
                     </Link>
