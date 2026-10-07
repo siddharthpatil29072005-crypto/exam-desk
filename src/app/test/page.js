@@ -96,7 +96,16 @@ function TestRunner() {
         notify("Your result has been saved to your account.", "success");
       }
       
-      setResult(resultData);
+      const uiResult = {
+        ...resultData,
+        answerReview: questions.map((q, index) => ({
+          ...q,
+          selectedOptionIndex: answers[index] ?? null,
+          correctOptionIndex: correctOptionIndices[index]
+        }))
+      };
+      
+      setResult(uiResult);
     } catch (submitError) {
       notify(submitError.message || "Something went wrong.", "error");
       submitting.current = false;
