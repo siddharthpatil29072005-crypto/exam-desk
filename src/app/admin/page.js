@@ -841,14 +841,99 @@ function TestBuilderPanel({
             Test duration (minutes)
             <input className="h-11 border border-slate-300 bg-white px-3 text-slate-950" min="0" onChange={(event) => setDurationMinutes(event.target.value)} type="number" value={durationMinutes} />
           </label>
-          <label className="grid gap-1.5 text-sm font-medium text-slate-700">
-            Start Time (Optional)
-            <input className="h-11 border border-slate-300 bg-white px-3 text-slate-950" type="datetime-local" onChange={(event) => setStartTime(event.target.value)} value={startTime || ""} />
-          </label>
-          <label className="grid gap-1.5 text-sm font-medium text-slate-700">
-            End Time (Optional)
-            <input className="h-11 border border-slate-300 bg-white px-3 text-slate-950" type="datetime-local" onChange={(event) => setEndTime(event.target.value)} value={endTime || ""} />
-          </label>
+
+          <div className="grid gap-1.5">
+            <div className="flex flex-wrap items-center justify-between gap-1">
+              <label className="text-sm font-medium text-slate-700">Start Date & Time (Optional)</label>
+              <div className="flex gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const now = new Date();
+                    const pad = (n) => String(n).padStart(2, "0");
+                    const val = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+                    setStartTime(val);
+                  }}
+                  className="rounded bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 hover:bg-blue-100"
+                >
+                  ⚡ Start now / Immediately
+                </button>
+                {startTime && (
+                  <button
+                    type="button"
+                    onClick={() => setStartTime("")}
+                    className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600 hover:bg-slate-200"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
+            <input
+              className="h-11 border border-slate-300 bg-white px-3 text-slate-950"
+              type="datetime-local"
+              onChange={(event) => setStartTime(event.target.value)}
+              value={startTime || ""}
+            />
+            <p className="text-xs text-slate-500">
+              {startTime
+                ? `Starts on: ${new Date(startTime).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}`
+                : "Leave empty or click 'Start now' for immediate availability."}
+            </p>
+          </div>
+
+          <div className="grid gap-1.5">
+            <div className="flex flex-wrap items-center justify-between gap-1">
+              <label className="text-sm font-medium text-slate-700">End Date & Time (Optional)</label>
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const base = startTime ? new Date(startTime) : new Date();
+                    const d = new Date(base.getTime() + 60 * 60 * 1000);
+                    const pad = (n) => String(n).padStart(2, "0");
+                    setEndTime(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`);
+                  }}
+                  className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600 hover:bg-slate-200"
+                >
+                  +1 hr
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const base = startTime ? new Date(startTime) : new Date();
+                    const d = new Date(base.getTime() + 24 * 60 * 60 * 1000);
+                    const pad = (n) => String(n).padStart(2, "0");
+                    setEndTime(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`);
+                  }}
+                  className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600 hover:bg-slate-200"
+                >
+                  +1 day
+                </button>
+                {endTime && (
+                  <button
+                    type="button"
+                    onClick={() => setEndTime("")}
+                    className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600 hover:bg-slate-200"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
+            <input
+              className="h-11 border border-slate-300 bg-white px-3 text-slate-950"
+              type="datetime-local"
+              onChange={(event) => setEndTime(event.target.value)}
+              value={endTime || ""}
+            />
+            <p className="text-xs text-slate-500">
+              {endTime
+                ? `Expires on: ${new Date(endTime).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}`
+                : "Leave empty for no expiration window."}
+            </p>
+          </div>
+
           <label className="grid gap-1.5 text-sm font-medium text-slate-700">
             Per-question timer (seconds, optional)
             <input className="h-11 border border-slate-300 bg-white px-3 text-slate-950" min="0" onChange={(event) => setTimePerQuestionSeconds(event.target.value)} type="number" value={timePerQuestionSeconds} />

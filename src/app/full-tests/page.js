@@ -7,6 +7,14 @@ import LoadingState from "@/components/LoadingState";
 import SetupNotice from "@/components/SetupNotice";
 import { useCollection } from "@/lib/useCollection";
 
+function formatDateTime(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime())
+    ? value
+    : new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(d);
+}
+
 export default function FullTestsPage() {
   const exams = useCollection("exams");
   const tests = useCollection("tests");
@@ -91,14 +99,14 @@ export default function FullTestsPage() {
                     <p className="mt-1 text-sm text-slate-600">
                       {test.questions?.length || 0} questions • {test.durationMinutes || "No"} min • +{test.marksPerQuestion || 1} / -{test.negativeMarkingPerWrongAnswer || 0} per wrong attempt
                     </p>
-                    {test.startTime && <p className="mt-1 text-xs text-slate-500">Available from: {new Date(test.startTime).toLocaleString()}</p>}
-                    {test.endTime && <p className="mt-1 text-xs text-slate-500">Ends at: {new Date(test.endTime).toLocaleString()}</p>}
+                    {test.startTime && <p className="mt-1 text-xs text-slate-600">📅 <span className="font-medium">Available from:</span> {formatDateTime(test.startTime)}</p>}
+                    {test.endTime && <p className="mt-1 text-xs text-slate-600">⏰ <span className="font-medium">Ends at:</span> {formatDateTime(test.endTime)}</p>}
                   </div>
                   
                   {isCompleted ? (
                     <Link
                       className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-800"
-                      href={`/test/?id=${encodeURIComponent(test.id)}`}
+                      href={`/test?id=${encodeURIComponent(test.id)}`}
                     >
                       View Result <ArrowRight aria-hidden="true" className="h-4 w-4" />
                     </Link>
@@ -113,9 +121,9 @@ export default function FullTestsPage() {
                   ) : (
                     <Link
                       className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 bg-blue-700 px-4 text-sm font-semibold text-white hover:bg-blue-800"
-                      href={`/test/?id=${encodeURIComponent(test.id)}`}
+                      href={`/test?id=${encodeURIComponent(test.id)}`}
                     >
-                      Start test <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                      Start now <ArrowRight aria-hidden="true" className="h-4 w-4" />
                     </Link>
                   )}
                 </article>

@@ -18,6 +18,14 @@ import { useToast } from "@/components/ToastProvider";
 
 const scoringApiBase = process.env.NEXT_PUBLIC_SCORING_API_URL?.replace(/\/+$/, "");
 
+function formatDateTime(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime())
+    ? value
+    : new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(d);
+}
+
 export default function TestPage() {
   return (
     <Suspense fallback={<LoadingState label="Loading test" />}>
@@ -186,7 +194,7 @@ function TestRunner() {
     return (
       <main className="mx-auto max-w-3xl px-4 py-12 text-center">
         <h1 className="text-2xl font-semibold text-slate-950">Test not started</h1>
-        <p className="mt-2 text-sm text-slate-600">This test will be available starting at {new Date(test.startTime).toLocaleString()}.</p>
+        <p className="mt-2 text-sm text-slate-600">This test will be available starting at {formatDateTime(test.startTime)}.</p>
         <Link className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-blue-800" href="/">
           <ArrowLeft aria-hidden="true" className="h-4 w-4" /> Back to tests
         </Link>
@@ -198,7 +206,7 @@ function TestRunner() {
     return (
       <main className="mx-auto max-w-3xl px-4 py-12 text-center">
         <h1 className="text-2xl font-semibold text-slate-950">Test expired</h1>
-        <p className="mt-2 text-sm text-slate-600">The time window for this test ended at {new Date(test.endTime).toLocaleString()}.</p>
+        <p className="mt-2 text-sm text-slate-600">The time window for this test ended at {formatDateTime(test.endTime)}.</p>
         <Link className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-blue-800" href="/">
           <ArrowLeft aria-hidden="true" className="h-4 w-4" /> Back to tests
         </Link>
