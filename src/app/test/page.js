@@ -2,7 +2,7 @@
 
 import { ArrowLeft, ArrowRight, Check, CircleAlert, Flag, RotateCcw } from "lucide-react";
 import Link from "next/link";
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import LoadingState from "@/components/LoadingState";
 import QuestionCard from "@/components/QuestionCard";
@@ -44,22 +44,24 @@ function TestRunner() {
 
   useEffect(() => {
     if (!id || !user || !test) {
-      if (test) setCheckingPastSubmission(false);
+      if (test || !loading) setCheckingPastSubmission(false);
       return;
     }
 
     async function checkStatus() {
       try {
         const status = await getTestSubmissionStatusAction(id);
-        if (status.success && status.hasSubmitted) {
+        if (status?.success && status?.hasSubmitted && status?.resultData) {
+          const detailsList = Array.isArray(status.resultData.details) ? status.resultData.details : [];
+          const correctIndices = Array.isArray(status.correctOptionIndices) ? status.correctOptionIndices : [];
           const uiResult = {
             ...status.resultData,
-            answerReview: test.questions.map((q, index) => {
-              const detail = status.resultData.details.find(d => d.questionId === q.id);
+            answerReview: (test.questions || []).map((q, index) => {
+              const detail = detailsList.find(d => d.questionId === q.id);
               return {
                 ...q,
                 selectedOptionIndex: detail ? detail.selectedOptionIndex : null,
-                correctOptionIndex: status.correctOptionIndices[index]
+                correctOptionIndex: correctIndices[index] ?? null
               };
             })
           };
@@ -73,7 +75,7 @@ function TestRunner() {
     }
     
     checkStatus();
-  }, [id, user, test]);
+  }, [id, user, test, loading]);
 
   async function submitTest() {
     if (submitting.current || !test || questions.length === 0) return;

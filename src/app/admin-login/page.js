@@ -21,10 +21,10 @@ export default function AdminLoginPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (status === "authenticated") {
+    if (status === "authenticated" && session?.user?.role === "admin") {
       router.replace("/admin");
     }
-  }, [status, router]);
+  }, [status, session, router]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -65,12 +65,18 @@ export default function AdminLoginPage() {
             <ShieldAlert className="h-6 w-6" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-white">
-            Admin Login
+            Admin {isSignup ? "Sign Up" : "Login"}
           </h1>
           <p className="mt-2 text-sm text-slate-400">
-            {isSignup ? "Authorize a new administrative account." : "Restricted portal access."}
+            {isSignup ? "Authorize and create a new administrator account." : "Restricted portal access."}
           </p>
         </div>
+
+        {status === "authenticated" && session?.user?.role !== "admin" && (
+          <div className="mb-5 rounded border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-300">
+            You are currently signed in as student (<strong>{session?.user?.email}</strong>). Log in below to switch to an administrator account.
+          </div>
+        )}
 
         <form className="grid gap-5" onSubmit={handleSubmit}>
           {error && (
@@ -116,7 +122,10 @@ export default function AdminLoginPage() {
           </div>
 
           <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-slate-300" htmlFor="adminPin">Secret Admin PIN</label>
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-slate-300" htmlFor="adminPin">Secret Admin PIN</label>
+              <span className="text-xs text-slate-400">Default: 1234</span>
+            </div>
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 <ShieldAlert aria-hidden="true" className="h-5 w-5 text-slate-500" />
@@ -125,7 +134,7 @@ export default function AdminLoginPage() {
                 className="block w-full rounded border border-slate-600 bg-slate-900 py-2.5 pl-10 pr-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
                 id="adminPin"
                 onChange={(e) => setAdminPin(e.target.value)}
-                placeholder="Required for authentication"
+                placeholder="Enter admin PIN (default 1234)"
                 required
                 type="password"
                 value={adminPin}

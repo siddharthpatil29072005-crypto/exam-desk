@@ -41,7 +41,11 @@ export async function fetchCollectionAction(collectionName) {
       const session = await getServerSession(authOptions);
       if (!session || !session.user) return { success: true, data: [] };
       if (session.user.role !== "admin") {
-        filter = { userId: session.user.id || session.user.email };
+        const uId = session.user.id || session.user.email;
+        const uEmail = session.user.email;
+        const matchArray = [{ userId: uId }];
+        if (uEmail && uEmail !== uId) matchArray.push({ userId: uEmail });
+        filter = { $or: matchArray };
       }
     }
 
@@ -59,9 +63,12 @@ export async function getTestSubmissionStatusAction(testId) {
     if (!session || !session.user) return { success: true, hasSubmitted: false };
 
     await connectToDatabase();
-    const userId = session.user.id || session.user.email;
+    const uId = session.user.id || session.user.email;
+    const uEmail = session.user.email;
+    const matchArray = [{ userId: uId }];
+    if (uEmail && uEmail !== uId) matchArray.push({ userId: uEmail });
     
-    const result = await Result.findOne({ testId, userId }).lean();
+    const result = await Result.findOne({ testId, $or: matchArray }).lean();
     if (!result) return { success: true, hasSubmitted: false };
 
     const answerKey = await AnswerKey.findOne({ id: testId }).lean();

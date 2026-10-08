@@ -71,7 +71,10 @@ export default function AdminPage() {
       router.push("/admin-login");
       return;
     }
-    setIsAdminClaim(user?.role === "admin");
+    if (user?.role === "admin") {
+      setIsAdminClaim(true);
+      setUnlocked(true);
+    }
   }, [user, loading, router]);
 
   function unlockAdmin(event) {

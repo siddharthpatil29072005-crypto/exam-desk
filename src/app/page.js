@@ -43,7 +43,7 @@ export default function HomePage() {
     <main className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
       <section className="grid gap-8 border-b border-slate-200 pb-10 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-800">Exam Desk Â· Practice</p>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-800">Exam Desk • Practice</p>
           <h1 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight text-slate-950 sm:text-4xl">
             Prepare with purpose.
           </h1>
