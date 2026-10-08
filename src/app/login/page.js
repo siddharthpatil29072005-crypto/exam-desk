@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowRight, KeyRound, Mail } from "lucide-react";
+import { ArrowRight, KeyRound, Mail, ShieldAlert } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { signIn, useSession } from "next-auth/react";
@@ -131,6 +132,16 @@ export default function LoginPage() {
           >
             {isSignup ? "Sign in instead" : "Create one now"}
           </button>
+        </div>
+
+        <div className="mt-6 border-t border-slate-200/60 pt-4 text-center">
+          <Link
+            href="/admin/login"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 transition-colors hover:text-blue-700"
+          >
+            <ShieldAlert className="h-3.5 w-3.5" />
+            <span>Administrator Access Portal</span>
+          </Link>
         </div>
       </div>
     </main>
