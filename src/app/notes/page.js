@@ -1,11 +1,13 @@
 "use client";
 
-import { BookText, FileText } from "lucide-react";
+import { BookText, FileText, Compass } from "lucide-react";
 import { useMemo, useState } from "react";
 import FilterBar from "@/components/FilterBar";
 import LoadingState from "@/components/LoadingState";
 import SetupNotice from "@/components/SetupNotice";
+import AdBanner from "@/components/AdBanner";
 import { useCollection } from "@/lib/useCollection";
+import { FOUNDATIONAL_STUDY_GUIDES } from "@/lib/default-notes";
 
 export default function NotesPage() {
   const exams = useCollection("exams");
@@ -34,6 +36,7 @@ export default function NotesPage() {
   }
 
   const loading = exams.loading || subjects.loading || topics.loading || notes.loading;
+  const hasFilter = Boolean(examId || subjectId || topicId);
 
   return (
     <main className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
@@ -77,13 +80,7 @@ export default function NotesPage() {
           <LoadingState label="Loading notes" />
         ) : exams.error || subjects.error || topics.error || notes.error ? (
           <div className="mt-6"><SetupNotice /></div>
-        ) : filteredNotes.length === 0 ? (
-          <div className="py-14 text-center">
-            <FileText aria-hidden="true" className="mx-auto h-8 w-8 text-slate-400" />
-            <p className="mt-3 text-sm font-semibold text-slate-800">No notes match these filters yet.</p>
-            <p className="mt-2 text-sm text-slate-500">Pick another exam, subject, or topic, or ask an admin to add notes.</p>
-          </div>
-        ) : (
+        ) : filteredNotes.length > 0 ? (
           <div className="mt-6 grid gap-5">
             {filteredNotes.map((note) => {
               const exam = exams.items.find((item) => item.id === note.examId);
@@ -103,7 +100,43 @@ export default function NotesPage() {
               );
             })}
           </div>
-        )}
+        ) : hasFilter ? (
+          <div className="py-14 text-center">
+            <FileText aria-hidden="true" className="mx-auto h-8 w-8 text-slate-400" />
+            <p className="mt-3 text-sm font-semibold text-slate-800">No custom notes match these specific filters yet.</p>
+            <p className="mt-2 text-sm text-slate-500">Clear filters or browse our core foundational guides below.</p>
+          </div>
+        ) : null}
+
+        <AdBanner className="my-8" />
+
+        {/* Foundational High-Yield Study Guides (Always available for students & search crawlers) */}
+        <div className="mt-12 border-t border-slate-200 pt-8">
+          <div className="flex items-center gap-2 text-blue-800">
+            <Compass className="h-5 w-5" />
+            <h3 className="text-lg font-semibold text-slate-950">Foundational Revision Guides</h3>
+          </div>
+          <p className="mt-1 text-sm text-slate-600">
+            Core mathematical formulas, verbal reasoning rules, and mock test time-management frameworks.
+          </p>
+
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
+            {FOUNDATIONAL_STUDY_GUIDES.map((guide) => (
+              <article className="flex flex-col justify-between rounded-lg border border-slate-200 bg-white p-5 shadow-xs transition hover:border-slate-300" key={guide.id}>
+                <div>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-blue-700">
+                    {guide.category}
+                  </span>
+                  <h4 className="mt-2 text-lg font-semibold text-slate-950">{guide.title}</h4>
+                  <p className="mt-1 text-xs text-slate-500 italic">{guide.summary}</p>
+                  <div className="mt-4 whitespace-pre-line rounded bg-slate-50 p-4 font-mono text-xs leading-relaxed text-slate-800">
+                    {guide.content}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
       </section>
     </main>
   );

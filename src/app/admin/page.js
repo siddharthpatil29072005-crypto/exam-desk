@@ -72,8 +72,10 @@ export default function AdminPage() {
       return;
     }
     if (user?.role === "admin") {
-      setIsAdminClaim(true);
-      setUnlocked(true);
+      setTimeout(() => {
+        setIsAdminClaim(true);
+        setUnlocked(true);
+      }, 0);
     }
   }, [user, loading, router]);
 

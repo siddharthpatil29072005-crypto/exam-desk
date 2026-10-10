@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import LoadingState from "@/components/LoadingState";
 import QuestionCard from "@/components/QuestionCard";
 import ResultCard from "@/components/ResultCard";
+import AdBanner from "@/components/AdBanner";
 import SetupNotice from "@/components/SetupNotice";
 import Timer from "@/components/Timer";
 import { useAuth } from "@/lib/auth-context";
@@ -52,7 +53,7 @@ function TestRunner() {
 
   useEffect(() => {
     if (!id || !user || !test) {
-      if (test || !loading) setCheckingPastSubmission(false);
+      if (test || !loading) setTimeout(() => setCheckingPastSubmission(false), 0);
       return;
     }
 
@@ -221,6 +222,7 @@ function TestRunner() {
         <h1 className="mt-2 text-2xl font-semibold text-slate-950">{test.title}</h1>
         {saving && <p className="mt-2 text-sm text-slate-500">Saving your result…</p>}
         <div className="mt-6"><ResultCard answers={answers} questions={questions} result={result} user={user} /></div>
+        <AdBanner className="my-6" />
         <Link className="mt-7 inline-flex min-h-11 items-center gap-2 bg-slate-950 px-4 text-sm font-semibold text-white hover:bg-slate-800" href="/">
           <ArrowLeft aria-hidden="true" className="h-4 w-4" /> Return to test library
         </Link>
